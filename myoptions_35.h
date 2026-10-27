@@ -4,7 +4,7 @@
 /* FOR 3.5'' 480x320, ESP32S3, IPS screen with AXS15231B driver & capacitive touchscreen - JC3248W535 module */
 /* !!! Do not be alarmed, all right, the default values ​​are not included in this file !!! */
 
-#define L10N_LANGUAGE       PL
+#define L10N_LANGUAGE       RU
 
 // DISPLAY
 #define DSP_MODEL			      DSP_AXS15231B
@@ -60,7 +60,7 @@
 
 #define CLOCK_TTS_ENABLED   false     // Enabled (true) or disabled (false)
 #define CLOCK_TTS_INTERVAL_MINUTES 30
-#define CLOCK_TTS_LANGUAGE  "PL"      // "EN", "DE", "RU", "RO", "NL", "HU", "FR", "PL" 
+#define CLOCK_TTS_LANGUAGE  "RU"      // "EN", "DE", "RU", "RO", "NL", "HU", "FR", "PL" 
 
 #define NAMEDAYS_FILE       PL        // HU, PL, NL
 #define POWER_SAVE          2         // 0=off, 1=on sleep, 2=always
