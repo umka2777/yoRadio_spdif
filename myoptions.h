@@ -1,79 +1,82 @@
 #ifndef myoptions_h
 #define myoptions_h
 
-/* FOR 3.5'' 480x320, ESP32S3, IPS screen with AXS15231B driver & capacitive touchscreen - JC3248W535 module */
-/* !!! Do not be alarmed, all right, the default values ​​are not included in this file !!! */
+/*
+ * Конфигурация ehRadio для Freenove ESP32-S3 Display 2.8" (FNK0104B)
+ * Аппаратное обеспечение: ESP32-S3 (16MB Flash / 8MB PSRAM)
+ * Дисплей: ILI9341 240x320 IPS (SPI)
+ * Тачскрин: FT6336G (I2C)
+ * Аудио: ES8311 (I2S + I2C)
+ */
 
+// ==================== Язык ====================
 #define L10N_LANGUAGE       RU
 
-// DISPLAY
-#define DSP_MODEL			      DSP_AXS15231B
-#define TFT_CS  			      45                /*  QSPI CS pin  */    
-#define TFT_SCK 			      47                /*  QSPI SCK pin */
-#define TFT_D0 				      21                /*  QSPI D0 pin  */
-#define TFT_D1 				      48                /*  QSPI D1 pin  */
-#define TFT_D2 				      40                /*  QSPI D2 pin  */
-#define TFT_D3 				      39                /*  QSPI D3 pin  */
-#define BRIGHTNESS_PIN		  1
-#define IR_TS_BRIGHTNESS_CONTROL
-#define USE_BUILTIN_LED     false             // IMPORTANT ! MUST be "false" for JC3248W535 module
+// ==================== Дисплей (ILI9341 SPI) ====================
+#define DSP_MODEL           DSP_ILI9341
+#define TFT_CS              10      // Chip Select
+#define TFT_DC              46      // Data/Command
+#define TFT_RST             -1      // Не подключён (общий с EN)
+#define TFT_SCK             12      // SPI Clock
+#define TFT_MOSI            11      // SPI Data Out
+#define TFT_MISO            13      // SPI Data In (только для чтения)
+#define BRIGHTNESS_PIN      45      // Подсветка (высокий уровень = вкл)
+#define TFT_IPS             1       // IPS-панель требует инверсии цветов
 
-// Touchscreen
-#define TS_MODEL 			      TS_MODEL_AXS15231B
-#define TS_SDA 				      4
-#define TS_SCL 				      8
-#define TS_INT 				      3
-#define TS_RST 				      -1
-#define TS_AXS15231_FIX                   // ghost touch on AXS15231 - accident wakeup elimination
+// ==================== Тачскрин (FT6336G I2C) ====================
+#define TS_MODEL            TS_MODEL_FT6336
+#define TS_SDA              16
+#define TS_SCL              15
+#define TS_INT              17
+#define TS_RST              18
 
-// SD CARD
-#define SDC_CS			        10
-#define SD_HSPI     		    true          // use HSPI for SD (SCK=14, MISO=12, MOSI=13) instead of VSPI (by default)
-#define SD_SPIPINS    		  12, 13, 11    // SCK, MISO, MOSI
+// ==================== Аудио (ES8311) ====================
+// Внутренний DAC/AMP — закомментирован (не используется на этой плате)
+// #define I2S_DOUT         41
+// #define I2S_BCLK         42
+// #define I2S_LRC          2
 
-// INTERNAL DAC/AMP
-#define I2S_DOUT            41
-#define I2S_BCLK            42
-#define I2S_LRC             2
-#define PLAYER_FORCE_MONO   true
-//#define LOGARYTMIC_VOLUME
+// Внешний кодек ES8311
+#define I2S_DOUT            8       // Данные от ESP32 к ES8311
+#define I2S_BCLK            5       // Bit Clock
+#define I2S_LRC             7       // Left/Right Clock (WS)
+#define I2S_MCLK            4       // Master Clock (ES8311 требует MCLK)
 
-// EXTERNAL DAC
-//#define I2S_DOUT            14
-//#define I2S_BCLK            9
-//#define I2S_LRC             46
+// Управление кодеком через I2C (разделяет шину с тачскрином)
+#define AUDIO_CODEC_I2C_SDA 16
+#define AUDIO_CODEC_I2C_SCL 15
+#define AUDIO_CODEC_PA_PIN  1       // Усилитель FM8002E (низкий уровень = вкл)
 
-// SPDIF OUT PIN
-#define SPDIF_OUT           18
+// ==================== SD-карта (SDIO 4-bit) ====================
+// ehRadio в основном использует SPI для SD. Если вы не используете офлайн-функции,
+// можно оставить закомментированным, чтобы не мешать компиляции.
+// Если нужно — раскомментируйте и проверьте поддержку SDIO в вашей версии ehRadio.
+// #define SDC_CS           10
+// #define SD_HSPI          true
+// #define SD_SPIPINS       12, 13, 11
 
-// RTC
-//#define RTC_MODULE			    DS3231
-//#define RTC_SDA			        17
-//#define RTC_SCL			        18
+// ==================== IR / Кнопки ====================
+// IR-приёмник (если установлен)
+// #define IR_PIN            6
+// #define IR_TIMEOUT        15
+// #define DECODE_HASH       false
 
-// IR/Misc
-#define IR_PIN              6
-#define IR_TIMEOUT          15
-#define DECODE_HASH         false
-#define NO_VOLUME_SCREEN
-#define VU_PEAK
+// ==================== Прочие настройки ====================
+#define PLAYER_FORCE_MONO   true    // Один динамик — принудительное моно
+#define NO_VOLUME_SCREEN            // Отключить экран громкости (по желанию)
+// #define VU_PEAK                  // Включить VU-метр (по желанию)
 
-#define CLOCK_TTS_ENABLED   false     // Enabled (true) or disabled (false)
-#define CLOCK_TTS_INTERVAL_MINUTES 30
-#define CLOCK_TTS_LANGUAGE  "RU"      // "EN", "DE", "RU", "RO", "NL", "HU", "FR", "PL" 
+// Энергосбережение
+#define POWER_SAVE          2       // 0=выкл, 1=только сон, 2=всегда
+#define WAKEUP_REBOOT               // Перезагрузка при пробуждении
 
-#define NAMEDAYS_FILE       PL        // HU, PL, NL
-#define POWER_SAVE          2         // 0=off, 1=on sleep, 2=always
-#define WAKEUP_REBOOT                 // reboot on "power on" via IR remote or touchscreen longpress 
-//#define CLOCKFONT_7SEG
-//#define WEATHER_FMT_SHORT
-#define WEATHER_WIND_UNITS_KPH
-//#define BOOMBOX_STYLE 
+// Часы / TTS (отключено)
+#define CLOCK_TTS_ENABLED   false
 
-// AUTOBACKLIGHT       
-//#define LIGHT_SENSOR        5        // lower pin voltage = higher brightness
-#define AUTOBACKLIGHT_DARK  4000      // max ADC value - at dark condition (0 - 4095)
-#define AUTOBACKLIGHT_BRI   100       // min ADC value - at bright condition (0 - 4095)
-#define AUTOBACKLIGHT_MIN   20        // min brightness [%] (0 - 100)
+// Автояркость (если есть датчик света — на этой плате нет, оставьте закомментированным)
+// #define LIGHT_SENSOR      5
+// #define AUTOBACKLIGHT_DARK  4000
+// #define AUTOBACKLIGHT_BRI   100
+// #define AUTOBACKLIGHT_MIN   20
 
 #endif
